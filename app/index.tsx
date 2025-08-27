@@ -1,43 +1,59 @@
 import { LinearGradient } from 'expo-linear-gradient';
-import { Link } from 'expo-router';
-import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { useRouter } from 'expo-router';
+import { useEffect } from 'react';
+import {
+  ImageBackground,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 
 export default function HomeScreen() {
+  const router = useRouter();
+
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      router.replace('/events'); 
+    }, 5000); 
+
+    return () => clearTimeout(timeout);
+  }, [router]);
+
   return (
-    <LinearGradient
-      colors={['#4F46E5', '#7C3AED']}
-      style={styles.container}
+    <ImageBackground
+      source={require('../assets/images/event-hero.jpg')}
+      style={styles.backgroundImage}
+      resizeMode="cover"
     >
-      <Image
-        source={require('../assets/images/event-hero.png')}
-        style={styles.heroImage}
-      />
-      <View style={styles.content}>
-        <Text style={styles.title}>Welcome to EventFlow</Text>
-        <Text style={styles.subtitle}>
-          Manage your events and RSVPs with ease
-        </Text>
-        <Link href="/events" asChild>
-          <TouchableOpacity style={styles.button}>
+      <LinearGradient
+        colors={['#04016C', 'rgba(4,1,108,0.5)', 'rgba(4,1,108,0.3)', 'transparent']}
+        style={styles.overlay}
+      >
+        <View style={styles.content}>
+          <Text style={styles.title}>Welcome to EventFlow</Text>
+          <Text style={styles.subtitle}>
+            Manage your events and RSVPs with ease
+          </Text>
+          <TouchableOpacity style={styles.button} onPress={() => router.push('/events')}>
             <Text style={styles.buttonText}>Browse Events</Text>
           </TouchableOpacity>
-        </Link>
-      </View>
-    </LinearGradient>
+        </View>
+      </LinearGradient>
+    </ImageBackground>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
+  backgroundImage: {
+    flex: 1,
+    justifyContent: 'center',
+  },
+  overlay: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
     padding: 20,
-  },
-  heroImage: {
-    width: 300,
-    height: 300,
-    marginBottom: 40,
   },
   content: {
     alignItems: 'center',

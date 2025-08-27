@@ -1,9 +1,17 @@
-export type Event = {
-  id: string;
+export interface Event {
+  _id: string;
   title: string;
-  date: Date;
-  location: string;
-  attendees: number;
-  image: string;
   description: string;
-};
+  date: Date;
+  location: {
+    address: string;
+    lat: number | null;
+    lng: number | null;
+  };
+  maxAttendees: number;
+  image: string | null;
+  attendees: string[]; 
+  __v?: number;
+  id: string;
+  attendeesCount: number;
+}

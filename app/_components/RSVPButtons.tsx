@@ -26,7 +26,7 @@ export default function RSVPButtons() {
           <Ionicons
             name="checkmark-circle"
             size={20}
-            color={rsvpStatus === 'yes' ? 'white' : '#4F46E5'}
+            color={rsvpStatus === 'yes' ? 'white' : '#04016C'}
           />
           <Text
             style={[
@@ -48,7 +48,7 @@ export default function RSVPButtons() {
           <Ionicons
             name="help-circle"
             size={20}
-            color={rsvpStatus === 'maybe' ? 'white' : '#4F46E5'}
+            color={rsvpStatus === 'maybe' ? 'white' : '#04016C'}
           />
           <Text
             style={[
@@ -70,7 +70,7 @@ export default function RSVPButtons() {
           <Ionicons
             name="close-circle"
             size={20}
-            color={rsvpStatus === 'no' ? 'white' : '#4F46E5'}
+            color={rsvpStatus === 'no' ? 'white' : '#04016C'}
           />
           <Text
             style={[
@@ -124,13 +124,13 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
   },
   buttonSelected: {
-    backgroundColor: '#4F46E5',
-    borderColor: '#4F46E5',
+    backgroundColor: '#04016C',
+    borderColor: '#04016C',
   },
   buttonText: {
     fontFamily: 'Inter-Medium',
     fontSize: 16,
-    color: '#4F46E5',
+    color: '#04016C',
   },
   buttonTextSelected: {
     color: '#FFFFFF',
@@ -138,7 +138,7 @@ const styles = StyleSheet.create({
   confirmationText: {
     fontFamily: 'Inter-Medium',
     fontSize: 16,
-    color: '#4F46E5',
+    color: '#04016C',
     textAlign: 'center',
     marginTop: 16,
   },

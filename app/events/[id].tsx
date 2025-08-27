@@ -1,46 +1,110 @@
+import { useRequest } from '@/hooks/useRequest';
 import { Event } from '@/models/events';
+import { Endpoints } from '@/utils/enums';
+import { showToast } from '@/utils/toast';
 import { Ionicons } from '@expo/vector-icons';
 import { format } from 'date-fns';
 import { Stack, useLocalSearchParams } from 'expo-router';
-import { Image, ScrollView, StyleSheet, Text, View } from 'react-native';
-import { events } from '../../constants/events';
+import { useEffect, useState } from 'react';
+import { ActivityIndicator, Image, ScrollView, StyleSheet, Text, View } from 'react-native';
 import RSVPButtons from '../_components/RSVPButtons';
 
 export default function EventDetailScreen() {
-  const { id } = useLocalSearchParams();
-  const event = events.find(e => e.id === id) as Event;
+  const { id } = useLocalSearchParams<{ id: string }>();
+  const [event, setEvent] = useState<Event | null>(null);
+  const { request, loading } = useRequest();
+
+  useEffect(() => {
+    const fetchEvent = async () => {
+      await request({
+        method: 'GET',
+        url: Endpoints.GET_EVENT_BY_ID + id,
+        onSuccess: (data) => {
+          if (!data) {
+            console.error('Invalid event data:', data);
+            return;
+          }
+          const eventData = {
+            ...data,
+            id: data._id,
+            date: new Date(data.date),
+            attendees: data.attendees?.length || 0,
+          };
+          setEvent(eventData);
+          showToast('success', 'Event details loaded');
+        },
+        onError: (error) => {
+          console.error('Failed to fetch event details:', error);
+          showToast('error', 'Failed to load event details');
+        },
+      });
+    };
+  
+    if (id) fetchEvent();
+  }, [id]);
+  
+
+  if (loading) {
+    return (
+      <View style={styles.center}>
+        <ActivityIndicator size="large" color="#111827" />
+      </View>
+    );
+  }
+
+  if (!event) {
+    return (
+      <View style={styles.center}>
+        <Text>Event not found</Text>
+      </View>
+    );
+  }
+
 
   return (
     <ScrollView style={styles.container}>
-      <Stack.Screen options={{ title: event.title }} />
-      
+    <Stack.Screen options={{ title: event.title }} />
+
+    {event.image && (
       <Image 
         source={{ uri: event.image }} 
         style={styles.headerImage}
       />
-      
-      <View style={styles.content}>
-        <Text style={styles.date}>
-          {format(event.date, 'EEEE, MMMM d, yyyy')}
-        </Text>
-        
-        <View style={styles.metaContainer}>
-          <View style={styles.metaItem}>
-            <Ionicons name="location-outline" size={20} color="#4F46E5" />
-            <Text style={styles.metaText}>{event.location}</Text>
-          </View>
-          <View style={styles.metaItem}>
-            <Ionicons name="people-outline" size={20} color="#4F46E5" />
-            <Text style={styles.metaText}>{event.attendees} attending</Text>
-          </View>
-        </View>
-        
-        <Text style={styles.sectionTitle}>About the Event</Text>
-        <Text style={styles.description}>{event.description}</Text>
-        
-        <RSVPButtons />
-      </View>
-    </ScrollView>
+    )}
+
+<View style={styles.content}>
+  <Text style={styles.date}>
+    {format(event.date, 'EEEE, MMMM d, yyyy')}
+  </Text>
+
+  {/* Meta section */}
+  <View style={styles.metaContainer}>
+    <View style={styles.metaItem}>
+      <Ionicons name="location-outline" size={18} color="#fff" />
+      <Text
+        style={styles.metaText}
+        numberOfLines={2} 
+        ellipsizeMode="tail"
+      >
+        {event.location?.address || 'No location'}
+      </Text>
+    </View>
+
+    <View style={styles.metaItem}>
+      <Ionicons name="people-outline" size={18} color="#fff" />
+      <Text style={styles.metaText}>
+        {event.attendees} / {event.maxAttendees} attending
+      </Text>
+    </View>
+  </View>
+
+  <Text style={styles.sectionTitle}>About the Event</Text>
+  <Text style={styles.description}>{event.description}</Text>
+
+  <RSVPButtons />
+</View>
+
+  </ScrollView>
   );
 }
 
@@ -63,19 +127,22 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   metaContainer: {
-    flexDirection: 'row',
-    gap: 16,
-    marginBottom: 24,
+    backgroundColor: '#04016C', 
+    borderRadius: 12,
+  padding: 12,
+  marginBottom: 24,
+  gap: 12, 
   },
   metaItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 4,
+    gap: 8,
   },
   metaText: {
+    flex: 1,                    
     fontFamily: 'Inter-Medium',
-    fontSize: 16,
-    color: '#374151',
+    fontSize: 15,
+    color: '#fff',
   },
   sectionTitle: {
     fontFamily: 'Inter-SemiBold',
@@ -90,4 +157,5 @@ const styles = StyleSheet.create({
     lineHeight: 24,
     marginBottom: 32,
   },
+  center: { flex: 1, justifyContent: 'center', alignItems: 'center' },
 });

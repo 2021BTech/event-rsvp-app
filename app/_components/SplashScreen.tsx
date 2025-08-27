@@ -29,7 +29,9 @@ export default function SplashScreen({ onAnimationComplete }: SplashScreenProps)
         useNativeDriver: true,
       }),
     ]).start(() => {
-      onAnimationComplete?.();
+      setTimeout(() => {
+        onAnimationComplete?.();
+      }, 0);
     });
   }, [fadeAnim, logoPosition, onAnimationComplete, scaleAnim]);
 
@@ -48,7 +50,7 @@ export default function SplashScreen({ onAnimationComplete }: SplashScreenProps)
         ]}
       >
         <Image
-          source={require('../../assets/images/logo.png')} // Replace with your logo
+          source={require('../../assets/images/eventflow-bg.png')}
           style={styles.logoImage}
           resizeMode="contain"
         />

@@ -9,10 +9,10 @@ SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
   const [fontsLoaded, fontError] = useFonts({
-    'Inter-Bold': require('../assets/fonts/Inter-Bold.ttf'),
-    'Inter-SemiBold': require('../assets/fonts/Inter-SemiBold.ttf'),
-    'Inter-Medium': require('../assets/fonts/Inter-Medium.ttf'),
-    'Inter-Regular': require('../assets/fonts/Inter-Regular.ttf'),
+    'Inter-Bold': require('../assets/fonts/Inter_18pt-Bold.ttf'),
+    'Inter-SemiBold': require('../assets/fonts/Inter_18pt-SemiBold.ttf'),
+    'Inter-Medium': require('../assets/fonts/Inter_18pt-Medium.ttf'),
+    'Inter-Regular': require('../assets/fonts/Inter_18pt-Regular.ttf'),
   });
 
   const [appReady, setAppReady] = useState(false);
@@ -36,7 +36,7 @@ export default function RootLayout() {
       <Stack
         screenOptions={{
           headerStyle: {
-            backgroundColor: '#4F46E5',
+            backgroundColor: '#04016C',
           },
           headerTintColor: '#fff',
           headerTitleStyle: {

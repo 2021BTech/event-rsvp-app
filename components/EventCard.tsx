@@ -10,10 +10,16 @@ type EventCardProps = {
 export default function EventCard({ event }: EventCardProps) {
   return (
     <View style={styles.card}>
-      <Image 
-        source={{ uri: event.image }} 
-        style={styles.image}
-      />
+      {event.image ? (
+        <Image 
+          source={{ uri: event.image }} 
+          style={styles.image}
+        />
+      ) : (
+        <View style={styles.imagePlaceholder}>
+          <Ionicons name="calendar-outline" size={48} color="#04016C" />
+        </View>
+      )}
       <View style={styles.content}>
         <Text style={styles.date}>
           {format(event.date, 'MMMM d, yyyy')}
@@ -21,12 +27,16 @@ export default function EventCard({ event }: EventCardProps) {
         <Text style={styles.title}>{event.title}</Text>
         <View style={styles.meta}>
           <View style={styles.metaItem}>
-            <Ionicons name="location-outline" size={16} color="#6B7280" />
-            <Text style={styles.metaText}>{event.location}</Text>
+            <Ionicons name="location-outline" size={16} color="#04016C" />
+            <Text style={styles.metaText}>
+              {event.location.address || 'Location not specified'}
+            </Text>
           </View>
           <View style={styles.metaItem}>
-            <Ionicons name="people-outline" size={16} color="#6B7280" />
-            <Text style={styles.metaText}>{event.attendees} attending</Text>
+            <Ionicons name="people-outline" size={16} color="#04016C" />
+            <Text style={styles.metaText}>
+              {event.attendeesCount} / {event.maxAttendees}
+            </Text>
           </View>
         </View>
       </View>
@@ -49,6 +59,14 @@ const styles = StyleSheet.create({
   image: {
     width: '100%',
     height: 160,
+    resizeMode: 'cover',
+  },
+  imagePlaceholder: {
+    width: '100%',
+    height: 160,
+    backgroundColor: '#F3F4F6',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   content: {
     padding: 16,
@@ -62,21 +80,26 @@ const styles = StyleSheet.create({
   title: {
     fontFamily: 'Inter-SemiBold',
     fontSize: 18,
-    color: '#111827',
+    color: '#04016C',
     marginBottom: 12,
+    fontWeight: '600',
   },
   meta: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    flexWrap: 'wrap',    
+    gap: 12,            
+    marginTop: 4,
   },
   metaItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 4,
+    flexShrink: 1,     
   },
   metaText: {
     fontFamily: 'Inter-Regular',
     fontSize: 14,
     color: '#6B7280',
+    flexShrink: 1,   
   },
+  
 });
