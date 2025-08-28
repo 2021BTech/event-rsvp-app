@@ -18,7 +18,6 @@ API.interceptors.request.use(
     const token = await SecureStore.getItemAsync('access_token');
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
-      console.log("Api request with token", token);
     }
     return config;
   },
@@ -38,4 +37,17 @@ API.interceptors.response.use(
   }
 );
 
+// Handle authentication errors
+API.interceptors.response.use(
+  (response) => response,
+  async (error) => {
+    if (error.response?.status === 401) {
+      // Token is invalid, clear it
+      await SecureStore.deleteItemAsync('access_token');
+    }
+    return Promise.reject(error);
+  }
+);
+
 export default API;
+

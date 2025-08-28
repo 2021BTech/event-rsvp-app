@@ -16,12 +16,18 @@ export default function EventDetailScreen() {
 
   useEffect(() => {
     const fetchEvent = async () => {
+      if (!id) {
+        console.error('No event ID provided');
+        showToast('error', 'No event ID provided');
+        return;
+      }
       await request({
         method: 'GET',
-        url: Endpoints.GET_EVENT_BY_ID + id,
+        url: `${Endpoints.GET_EVENT}${id}`,
         onSuccess: (data) => {
           if (!data) {
             console.error('Invalid event data:', data);
+            showToast('error', 'Invalid event data received');
             return;
           }
           const eventData = {
@@ -60,51 +66,50 @@ export default function EventDetailScreen() {
     );
   }
 
-
   return (
     <ScrollView style={styles.container}>
-    <Stack.Screen options={{ title: event.title }} />
+      <Stack.Screen options={{ title: event.title }} />
 
-    {event.image && (
-      <Image 
-        source={{ uri: event.image }} 
-        style={styles.headerImage}
-      />
-    )}
+      {event.image && (
+        <Image 
+          source={{ uri: event.image }} 
+          style={styles.headerImage}
+        />
+      )}
 
-<View style={styles.content}>
-  <Text style={styles.date}>
-    {format(event.date, 'EEEE, MMMM d, yyyy')}
-  </Text>
+      <View style={styles.content}>
+        <Text style={styles.date}>
+          {format(event.date, 'EEEE, MMMM d, yyyy')}
+        </Text>
 
-  {/* Meta section */}
-  <View style={styles.metaContainer}>
-    <View style={styles.metaItem}>
-      <Ionicons name="location-outline" size={18} color="#fff" />
-      <Text
-        style={styles.metaText}
-        numberOfLines={2} 
-        ellipsizeMode="tail"
-      >
-        {event.location?.address || 'No location'}
-      </Text>
-    </View>
+        {/* Meta section */}
+        <View style={styles.metaContainer}>
+          <View style={styles.metaItem}>
+            <Ionicons name="location-outline" size={18} color="#fff" />
+            <Text
+              style={styles.metaText}
+              numberOfLines={2} 
+              ellipsizeMode="tail"
+            >
+              {event.location?.address || 'No location'}
+            </Text>
+          </View>
 
-    <View style={styles.metaItem}>
-      <Ionicons name="people-outline" size={18} color="#fff" />
-      <Text style={styles.metaText}>
-        {event.attendees} / {event.maxAttendees} attending
-      </Text>
-    </View>
-  </View>
+          <View style={styles.metaItem}>
+            <Ionicons name="people-outline" size={18} color="#fff" />
+            <Text style={styles.metaText}>
+              {event.attendees} / {event.maxAttendees} attending
+            </Text>
+          </View>
+        </View>
 
-  <Text style={styles.sectionTitle}>About the Event</Text>
-  <Text style={styles.description}>{event.description}</Text>
+        <Text style={styles.sectionTitle}>About the Event</Text>
+        <Text style={styles.description}>{event.description}</Text>
 
-  <RSVPButtons />
-</View>
-
-  </ScrollView>
+        {/* Pass the event ID to RSVPButtons */}
+        <RSVPButtons eventId={event._id || event.id} />
+      </View>
+    </ScrollView>
   );
 }
 
@@ -129,9 +134,9 @@ const styles = StyleSheet.create({
   metaContainer: {
     backgroundColor: '#04016C', 
     borderRadius: 12,
-  padding: 12,
-  marginBottom: 24,
-  gap: 12, 
+    padding: 12,
+    marginBottom: 24,
+    gap: 12, 
   },
   metaItem: {
     flexDirection: 'row',

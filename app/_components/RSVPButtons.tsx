@@ -1,15 +1,55 @@
+import { useAuth } from '@/context/AuthContext';
+import { useRequest } from '@/hooks/useRequest';
+import { RSVPButtonProps, RSVPStatus } from '@/models/events';
+import { Endpoints } from '@/utils/enums';
+import { showToast } from '@/utils/toast';
 import { Ionicons } from '@expo/vector-icons';
 import { useState } from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import AuthModal from './AuthModal';
 
-type RSVPStatus = 'yes' | 'maybe' | 'no' | null;
 
-export default function RSVPButtons() {
-  const [rsvpStatus, setRsvpStatus] = useState<RSVPStatus>(null);
+export default function RSVPButton({ eventId, initialStatus = null, onStatusChange }: RSVPButtonProps) {
+  const [rsvpStatus, setRsvpStatus] = useState<RSVPStatus>(initialStatus);
+  const [showAuthModal, setShowAuthModal] = useState(false);
+  const [authMode, setAuthMode] = useState<'login' | 'register'>('login');
+  const { user, token } = useAuth();
+  const { request } = useRequest();
 
-  const handleRSVP = (status: RSVPStatus) => {
-    setRsvpStatus(status);
-    // Here you would typically make an API call to update the RSVP status
+  const handleRSVP = async (status: RSVPStatus) => {
+    if (!user || !token) {
+      setAuthMode('login');
+      setShowAuthModal(true);
+      return;
+    }
+  
+    if (rsvpStatus === status) {
+      showToast('info', `You are already marked as ${status}`);
+      return;
+    }
+  
+    await request({
+      method: 'POST',
+      url: Endpoints.RSVP_EVENT.replace(':id', eventId),
+      data: { status },
+      onSuccess: () => {
+        setRsvpStatus(status);
+        if (onStatusChange) {
+          onStatusChange(status);
+        }
+        showToast('success', `You've marked yourself as ${status}`);
+      },
+      onError: (error) => {
+        showToast('error', 'Failed to update RSVP status');
+        console.error('RSVP error:', error);
+      }
+    });
+  };
+  
+
+  const handleAuthSuccess = () => {
+    // After successful authentication, the user can now RSVP
+    showToast('success', 'You are now logged in. You can RSVP to events.');
   };
 
   return (
@@ -19,19 +59,19 @@ export default function RSVPButtons() {
         <TouchableOpacity
           style={[
             styles.button,
-            rsvpStatus === 'yes' && styles.buttonSelected
+            rsvpStatus === 'Going' && styles.buttonSelected
           ]}
-          onPress={() => handleRSVP('yes')}
+          onPress={() => handleRSVP('Going')}
         >
           <Ionicons
             name="checkmark-circle"
             size={20}
-            color={rsvpStatus === 'yes' ? 'white' : '#04016C'}
+            color={rsvpStatus === 'Going' ? 'white' : '#04016C'}
           />
           <Text
             style={[
               styles.buttonText,
-              rsvpStatus === 'yes' && styles.buttonTextSelected
+              rsvpStatus === 'Going' && styles.buttonTextSelected
             ]}
           >
             Going
@@ -41,19 +81,19 @@ export default function RSVPButtons() {
         <TouchableOpacity
           style={[
             styles.button,
-            rsvpStatus === 'maybe' && styles.buttonSelected
+            rsvpStatus === 'Maybe' && styles.buttonSelected
           ]}
-          onPress={() => handleRSVP('maybe')}
+          onPress={() => handleRSVP('Maybe')}
         >
           <Ionicons
             name="help-circle"
             size={20}
-            color={rsvpStatus === 'maybe' ? 'white' : '#04016C'}
+            color={rsvpStatus === 'Maybe' ? 'white' : '#04016C'}
           />
           <Text
             style={[
               styles.buttonText,
-              rsvpStatus === 'maybe' && styles.buttonTextSelected
+              rsvpStatus === 'Maybe' && styles.buttonTextSelected
             ]}
           >
             Maybe
@@ -63,19 +103,19 @@ export default function RSVPButtons() {
         <TouchableOpacity
           style={[
             styles.button,
-            rsvpStatus === 'no' && styles.buttonSelected
+            rsvpStatus === 'NotGoing' && styles.buttonSelected
           ]}
-          onPress={() => handleRSVP('no')}
+          onPress={() => handleRSVP('NotGoing')}
         >
           <Ionicons
             name="close-circle"
             size={20}
-            color={rsvpStatus === 'no' ? 'white' : '#04016C'}
+            color={rsvpStatus === 'NotGoing' ? 'white' : '#04016C'}
           />
           <Text
             style={[
               styles.buttonText,
-              rsvpStatus === 'no' && styles.buttonTextSelected
+              rsvpStatus === 'NotGoing' && styles.buttonTextSelected
             ]}
           >
             Can&apos;t Go
@@ -85,13 +125,20 @@ export default function RSVPButtons() {
 
       {rsvpStatus && (
         <Text style={styles.confirmationText}>
-          {rsvpStatus === 'yes' 
+          {rsvpStatus === 'Going' 
             ? "You're going! 🎉" 
-            : rsvpStatus === 'maybe' 
+            : rsvpStatus === 'Maybe' 
             ? "We'll see you there! 🤞" 
             : "Hope to see you next time! 👋"}
         </Text>
       )}
+
+      <AuthModal
+        visible={showAuthModal}
+        onClose={() => setShowAuthModal(false)}
+        onSuccess={handleAuthSuccess}
+        defaultMode={authMode}
+      />
     </View>
   );
 }

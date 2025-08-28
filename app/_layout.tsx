@@ -1,9 +1,12 @@
+import { AuthProvider } from '@/context/AuthContext';
 import { useFonts } from 'expo-font';
 import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { useEffect, useState } from 'react';
 import { View } from 'react-native';
+import Toast from 'react-native-toast-message';
 import SplashScreenComponent from './_components/SplashScreen';
+
 
 SplashScreen.preventAutoHideAsync();
 
@@ -32,22 +35,28 @@ export default function RootLayout() {
   }
 
   return (
-    <View style={{ flex: 1 }}>
-      <Stack
-        screenOptions={{
-          headerStyle: {
-            backgroundColor: '#04016C',
-          },
-          headerTintColor: '#fff',
-          headerTitleStyle: {
-            fontFamily: 'Inter-SemiBold',
-          },
-        }}
-      >
-        <Stack.Screen name="index" options={{ headerShown: false }} />
-        <Stack.Screen name="events/index" options={{ title: 'Upcoming Events' }} />
-        <Stack.Screen name="events/[id]" options={{ title: 'Event Details' }} />
-      </Stack>
-    </View>
+    <AuthProvider>
+      <View style={{ flex: 1 }}>
+        <Stack
+          screenOptions={{
+            headerStyle: {
+              backgroundColor: '#04016C',
+            },
+            headerTintColor: '#fff',
+            headerTitleStyle: {
+              fontFamily: 'Inter-SemiBold',
+            },
+          }}
+        >
+          <Stack.Screen name="index" options={{ headerShown: false }} />
+          <Stack.Screen name="events/index" options={{ title: 'Upcoming Events' }} />
+          <Stack.Screen name="events/[id]" options={{ title: 'Event Details' }} />
+          <Stack.Screen name="profile" options={{ title: 'My Profile' }} />
+          <Stack.Screen name="auth/login" options={{ title: 'Sign In' }} />
+          <Stack.Screen name="auth/register" options={{ title: 'Create Account' }} />
+        </Stack>
+        <Toast />
+      </View>
+    </AuthProvider>
   );
 }

@@ -15,3 +15,10 @@ export interface Event {
   id: string;
   attendeesCount: number;
 }
+
+export type RSVPStatus = 'Going' | 'NotGoing' | 'Maybe' | null;
+export interface RSVPButtonProps {
+  eventId: string;
+  initialStatus?: RSVPStatus;
+  onStatusChange?: (newStatus: RSVPStatus) => void;
+}
